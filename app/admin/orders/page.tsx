@@ -2,14 +2,30 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Package, ArrowLeft } from "lucide-react"
+import { Package } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { formatDistanceToNow } from "date-fns"
 import { OrderStatusSelect } from "@/components/admin/order-status-select"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb"
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>
+}) {
+  const sp = await searchParams
+  const activeStatus = sp?.status || "all"
+  const activeCustomerId = sp?.customer_id || ""
   const supabase = await createClient()
   const {
     data: { user },
@@ -27,7 +43,7 @@ export default async function AdminOrdersPage() {
   }
 
   // Get all orders with customer and order items info
-  const { data: orders } = await supabase
+  let query = supabase
     .from("orders")
     .select(
       `
@@ -40,6 +56,15 @@ export default async function AdminOrdersPage() {
     `,
     )
     .order("created_at", { ascending: false })
+
+  if (activeStatus && activeStatus !== "all") {
+    query = query.eq("status", activeStatus)
+  }
+  if (activeCustomerId) {
+    query = query.eq("customer_id", activeCustomerId)
+  }
+
+  const { data: orders } = await query
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
@@ -66,15 +91,20 @@ export default async function AdminOrdersPage() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/admin">
-                  <ArrowLeft className="h-5 w-5" />
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2">
-                <Package className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">Order Management</span>
-              </div>
+              <SidebarTrigger />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link href="/admin">Admin</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Orders</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -90,6 +120,36 @@ export default async function AdminOrdersPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">All Orders</h1>
           <p className="text-muted-foreground">Manage and track customer orders</p>
+        </div>
+
+        <div className="mb-6 -mx-4 px-4 overflow-x-auto flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground">Filter:</span>
+          {[
+            { key: "all", label: "All" },
+            { key: "pending", label: "Pending" },
+            { key: "paid", label: "Paid" },
+            { key: "processing", label: "Processing" },
+            { key: "shipped", label: "Shipped" },
+            { key: "delivered", label: "Delivered" },
+            { key: "cancelled", label: "Cancelled" },
+          ].map((opt) => (
+            <Button
+              key={opt.key}
+              variant={activeStatus === opt.key ? "secondary" : "outline"}
+              className={`bg-transparent ${activeStatus === opt.key ? "ring-2 ring-primary font-semibold" : ""}`}
+              asChild
+              size="sm"
+            >
+              <Link href={`/admin/orders?status=${opt.key}${activeCustomerId ? `&customer_id=${activeCustomerId}` : ""}`}>
+                {opt.label}
+              </Link>
+            </Button>
+          ))}
+          {activeCustomerId && (
+            <Button variant="outline" size="sm" asChild className="ml-auto bg-transparent">
+              <Link href="/admin/orders">Clear customer filter</Link>
+            </Button>
+          )}
         </div>
 
         <Card>

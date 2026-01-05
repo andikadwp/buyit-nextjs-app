@@ -44,7 +44,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             {/* Product Image */}
             <div className="aspect-square overflow-hidden rounded-xl border bg-muted">
               <img
-                src={product.image || `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(product.name)}`}
+                src={product.image_url || `/placeholder.svg?height=600&width=600&query=${encodeURIComponent(product.name)}`}
                 alt={product.name}
                 className="h-full w-full object-cover"
               />
@@ -88,21 +88,21 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <Card>
                 <CardContent className="grid gap-4 p-6">
                   <div className="flex items-start gap-3">
-                    <Truck className="h-5 w-5 flex-shrink-0 text-primary" />
+                    <Truck className="h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <h3 className="font-semibold">Free Shipping</h3>
                       <p className="text-sm text-muted-foreground">On orders over $50</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Shield className="h-5 w-5 flex-shrink-0 text-primary" />
+                    <Shield className="h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <h3 className="font-semibold">Secure Payment</h3>
                       <p className="text-sm text-muted-foreground">SSL encrypted checkout</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="h-5 w-5 shrink-0 text-primary" />
                     <div>
                       <h3 className="font-semibold">30-Day Returns</h3>
                       <p className="text-sm text-muted-foreground">Money-back guarantee</p>
@@ -127,7 +127,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     <div className="aspect-square overflow-hidden bg-muted">
                       <img
                         src={
-                          relatedProduct.image ||
+                          relatedProduct.image_url ||
                           `/placeholder.svg?height=300&width=300&query=${encodeURIComponent(relatedProduct.name) || "/placeholder.svg"}`
                         }
                         alt={relatedProduct.name}

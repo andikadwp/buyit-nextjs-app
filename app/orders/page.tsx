@@ -7,7 +7,7 @@ import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { formatDistanceToNow } from "date-fns"
 
-export default async function OrdersPage() {
+export default async function OrdersPage({ searchParams }: { searchParams?: Promise<{ status?: string }> }) {
   const supabase = await createClient()
   const {
     data: { user },
@@ -17,7 +17,9 @@ export default async function OrdersPage() {
     redirect("/auth/login")
   }
 
-  const { data: orders } = await supabase
+  const { status } = (await searchParams) || {}
+
+  let query = supabase
     .from("orders")
     .select(`
       *,
@@ -27,12 +29,19 @@ export default async function OrdersPage() {
       )
     `)
     .eq("customer_id", user.id)
-    .order("created_at", { ascending: false })
+
+  if (status && status !== "all") {
+    query = query.eq("status", status)
+  }
+
+  const { data: orders } = await query.order("created_at", { ascending: false })
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "secondary"
+      case "paid":
+        return "default"
       case "processing":
         return "default"
       case "shipped":
@@ -50,6 +59,19 @@ export default async function OrdersPage() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">My Orders</h1>
 
+        <div className="flex flex-wrap gap-2 mb-6">
+          {["all", "pending", "paid", "processing", "shipped", "delivered", "cancelled"].map((s) => (
+            <Button
+              key={s}
+              asChild
+              variant={status === s || (!status && s === "all") ? "default" : "outline"}
+              className={(status === s || (!status && s === "all")) ? "ring-2 ring-offset-2" : ""}
+            >
+              <Link href={s === "all" ? "/orders" : `/orders?status=${s}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</Link>
+            </Button>
+          ))}
+        </div>
+
         {!orders || orders.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
@@ -60,7 +82,7 @@ export default async function OrdersPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {orders.map((order) => (
               <Card key={order.id}>
                 <CardHeader>

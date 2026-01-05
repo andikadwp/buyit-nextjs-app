@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { format } from "date-fns"
-import { Package, MapPin, CreditCard } from "lucide-react"
+import { Package, MapPin, CreditCard, CheckCircle2, Circle, XCircle } from "lucide-react"
 
 export default async function OrderDetailPage({
   params,
@@ -87,7 +87,7 @@ export default async function OrderDetailPage({
                 <div className="space-y-4">
                   {order.order_items?.map((item: any) => (
                     <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
-                      <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                      <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted shrink-0">
                         <Image
                           src={item.products?.image_url || "/placeholder.svg"}
                           alt={item.products?.name || "Product"}
@@ -150,40 +150,11 @@ export default async function OrderDetailPage({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Order Status
+                  Order Progress
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-sm">Order placed</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className={`h-2 w-2 rounded-full ${order.status !== "pending" ? "bg-primary" : "bg-muted"}`} />
-                    <span className={`text-sm ${order.status === "pending" ? "text-muted-foreground" : ""}`}>
-                      Processing
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`h-2 w-2 rounded-full ${order.status === "shipped" || order.status === "delivered" ? "bg-primary" : "bg-muted"}`}
-                    />
-                    <span
-                      className={`text-sm ${order.status !== "shipped" && order.status !== "delivered" ? "text-muted-foreground" : ""}`}
-                    >
-                      Shipped
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`h-2 w-2 rounded-full ${order.status === "delivered" ? "bg-primary" : "bg-muted"}`}
-                    />
-                    <span className={`text-sm ${order.status !== "delivered" ? "text-muted-foreground" : ""}`}>
-                      Delivered
-                    </span>
-                  </div>
-                </div>
+                <Timeline status={order.status} createdAt={order.created_at} updatedAt={order.updated_at} />
               </CardContent>
             </Card>
           </div>
@@ -192,3 +163,77 @@ export default async function OrderDetailPage({
     </div>
   )
 }
+
+const orderedStatuses = ["pending", "paid", "processing", "shipped", "delivered"] as const
+type OrderStatus = (typeof orderedStatuses)[number] | "cancelled"
+
+function Timeline({ status, createdAt, updatedAt }: { status: OrderStatus; createdAt: string; updatedAt: string }) {
+  const completed = (step: OrderStatus) => {
+    if (status === "cancelled") return false
+    const currentIndex = orderedStatuses.indexOf(status as any)
+    const stepIndex = orderedStatuses.indexOf(step as any)
+    return stepIndex !== -1 && currentIndex >= stepIndex
+  }
+
+  const items = [
+    { key: "pending", label: "Order Placed", time: createdAt },
+    { key: "paid", label: "Order Confirmed", time: status !== "pending" ? updatedAt : null },
+    { key: "processing", label: "Packaging", time: ["processing", "shipped", "delivered"].includes(status) ? updatedAt : null },
+    { key: "shipped", label: "Out for Delivery", time: ["shipped", "delivered"].includes(status) ? updatedAt : null },
+    { key: "delivered", label: "Delivered", time: status === "delivered" ? updatedAt : null },
+  ] as const
+
+  return (
+    <div className="relative">
+      {/* garis di tengah kolom icon (w-6 => center) */}
+      <div className="absolute left-3 top-2 bottom-2 w-px bg-muted-foreground/30 z-0" />
+
+      <div className="space-y-5">
+        {items.map((it) => {
+          const isActive = completed(it.key as OrderStatus)
+
+          return (
+            <div key={it.key} className="relative flex gap-3">
+              {/* kolom icon fixed */}
+              <div className="relative w-6 flex-none">
+                <span className="absolute left-1/2 top-0.5 -translate-x-1/2 z-10 inline-flex rounded-full bg-background p-0.5">
+                  <StepIcon active={isActive} />
+                </span>
+              </div>
+
+              <div className="flex-1">
+                <p className={`text-sm ${isActive ? "font-medium" : "text-muted-foreground"}`}>{it.label}</p>
+                {it.time && (
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(it.time), "EEE, dd MMM yyyy HH:mm")}
+                  </p>
+                )}
+              </div>
+            </div>
+          )
+        })}
+
+        {status === "cancelled" && (
+          <div className="relative flex gap-3">
+            <div className="relative w-6 flex-none">
+              <span className="absolute left-1/2 top-0.5 -translate-x-1/2 z-10 inline-flex rounded-full bg-background p-0.5">
+                <XCircle className="h-4 w-4 text-destructive" />
+              </span>
+            </div>
+            <p className="text-sm text-destructive font-medium">Cancelled</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+function StepIcon({ active }: { active?: boolean }) {
+  return active ? (
+    <CheckCircle2 className="h-4 w-4 text-primary" />
+  ) : (
+    <Circle className="h-4 w-4 text-muted-foreground" />
+  )
+}
+

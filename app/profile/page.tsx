@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Header } from "@/components/header"
 import { LogoutButton } from "@/components/logout-button"
 import { User, Mail } from "lucide-react"
+import { ProfileForm } from "@/components/profile-form"
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -46,6 +47,21 @@ export default async function ProfilePage() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle>Edit Profile</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <ProfileForm
+                initial={{
+                  full_name: customer?.full_name || user.user_metadata?.full_name || "",
+                  email: user.email || "",
+                  phone: customer?.phone || "",
+                  address: customer?.address || "",
+                }}
+              />
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle>Actions</CardTitle>

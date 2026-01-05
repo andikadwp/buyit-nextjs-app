@@ -27,12 +27,12 @@ export function CartSheet() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col p-0">
         <SheetHeader>
-          <SheetTitle>Shopping Cart ({itemCount})</SheetTitle>
+          <SheetTitle className="px-3 sm:px-4 pt-4">Shopping Cart ({itemCount})</SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto py-4">
+        <div className="flex-1 overflow-y-auto py-4 px-3 sm:px-4">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
@@ -41,8 +41,8 @@ export function CartSheet() {
           ) : (
             <div className="space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-4 border-b pb-4">
-                  <div className="relative h-20 w-20 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                <div key={item.id} className="flex gap-4 border rounded-lg p-2 sm:p-3">
+                  <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted shrink-0">
                     <Image src={item.image_url || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -84,7 +84,7 @@ export function CartSheet() {
         </div>
 
         {items.length > 0 && (
-          <SheetFooter className="flex-col gap-4">
+          <SheetFooter className="flex-col gap-4 px-3 sm:px-4 pb-4">
             <div className="flex justify-between items-center text-lg font-bold">
               <span>Total:</span>
               <span>${total.toFixed(2)}</span>

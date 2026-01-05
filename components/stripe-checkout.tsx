@@ -26,6 +26,9 @@ export function StripeCheckout({ items, onSuccess }: StripeCheckoutProps) {
     }))
 
     const clientSecret = await createCheckoutSession(checkoutItems)
+    if (!clientSecret) {
+      throw new Error("Client secret tidak tersedia")
+    }
     return clientSecret
   }, [items])
 

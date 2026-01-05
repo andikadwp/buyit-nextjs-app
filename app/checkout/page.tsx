@@ -43,6 +43,21 @@ export default function CheckoutPage() {
     })
   }, [])
 
+  useEffect(() => {
+    const loadSavedProfile = async () => {
+      const { data: customer } = await supabase
+        .from("customers")
+        .select("phone, address")
+        .limit(1)
+        .single()
+      if (customer) {
+        setPhone(customer.phone || "")
+        setShippingAddress(customer.address || "")
+      }
+    }
+    loadSavedProfile()
+  }, [])
+
   const handleProceedToPayment = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -226,7 +241,7 @@ export default function CheckoutPage() {
                   <div className="space-y-3">
                     {items.map((item) => (
                       <div key={item.id} className="flex gap-3">
-                        <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
+                        <div className="relative h-16 w-16 rounded-md overflow-hidden bg-muted shrink-0">
                           <img
                             src={
                               item.image || `/placeholder.svg?height=64&width=64&query=${encodeURIComponent(item.name)}`

@@ -21,8 +21,8 @@ export default async function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+        <section className="relative overflow-hidden bg-linear-to-br from-background via-background to-primary/5">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
           <div className="container mx-auto px-4 py-24 md:py-32 lg:py-40">
             <div className="mx-auto max-w-4xl text-center">
               <Badge className="mb-6 text-sm" variant="secondary">
@@ -30,7 +30,7 @@ export default async function Home() {
               </Badge>
               <h1 className="mb-6 text-balance text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
                 Premium Tech
-                <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <span className="block bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                   Redefined
                 </span>
               </h1>
@@ -159,15 +159,15 @@ export default async function Home() {
                 </p>
                 <ul className="mb-8 space-y-4">
                   <li className="flex items-start gap-3">
-                    <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="mt-1 h-5 w-5 shrink-0 text-primary" />
                     <span>Carefully selected products from trusted brands</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="mt-1 h-5 w-5 shrink-0 text-primary" />
                     <span>Rigorous quality control on every item</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="mt-1 h-5 w-5 shrink-0 text-primary" />
                     <span>Dedicated customer support team</span>
                   </li>
                 </ul>
@@ -184,7 +184,7 @@ export default async function Home() {
 
         {/* CTA Section */}
         <section className="container mx-auto px-4 py-16 md:py-24">
-          <div className="rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-8 text-center text-primary-foreground md:p-16">
+          <div className="rounded-2xl bg-linear-to-br from-primary to-primary/80 p-8 text-center text-primary-foreground md:p-16">
             <h2 className="mb-4 text-balance text-3xl font-bold md:text-4xl lg:text-5xl">Ready to Upgrade?</h2>
             <p className="mx-auto mb-8 max-w-2xl text-pretty text-lg opacity-90">
               Join thousands of satisfied customers who trust us for their tech needs

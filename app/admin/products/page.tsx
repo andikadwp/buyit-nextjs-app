@@ -2,12 +2,21 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Package, ArrowLeft, Plus } from "lucide-react"
+import { Package, Plus } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ProductActions } from "@/components/admin/product-actions"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb"
 
 export default async function AdminProductsPage() {
   const supabase = await createClient()
@@ -35,15 +44,20 @@ export default async function AdminProductsPage() {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/admin">
-                  <ArrowLeft className="h-5 w-5" />
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2">
-                <Package className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">Product Management</span>
-              </div>
+              <SidebarTrigger />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link href="/admin">Admin</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Products</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -88,7 +102,7 @@ export default async function AdminProductsPage() {
                         <div className="h-12 w-12 rounded-md overflow-hidden bg-muted">
                           <img
                             src={
-                              product.image ||
+                              product.image_url ||
                               `/placeholder.svg?height=48&width=48&query=${encodeURIComponent(product.name) || "/placeholder.svg"}`
                             }
                             alt={product.name}
